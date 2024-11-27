@@ -35,12 +35,12 @@ Edit the script to configure the following parameters:
 
 ### Controller Name
 
-List device input names :
+List input devices by name :
 
 ```bash
 grep -E 'Name' /proc/bus/input/devices
 ```
-example output :
+Example output :
 
 ```bash
 N: Name="Power Button"
@@ -54,14 +54,14 @@ Look for the ``Name=`` field corresponding to your controller.
 Set the name of your controller as shown in ``/proc/bus/input/devices``:
 
 ```bash
-CONTROLLER_NAME="PLAYSTATION\(R\)3 Controller"
+CONTROLLER_NAME="PLAYSTATION\\(R\\)3 Controller"
 ```
 ### Idle Timeout
 
 Specify the idle timeout in seconds:
 
 ```bash
-IDLE_LIMIT=$((5 * 60))  # Time in seconds
+IDLE_LIMIT=300
 ```
 
 ### Deadzone Threshold
@@ -69,7 +69,7 @@ IDLE_LIMIT=$((5 * 60))  # Time in seconds
 Define the deadzone for analog stick drift:
 
 ```bash
-DEADZONE_THRESHOLD=15
+DEADZONE_THRESHOLD=150
 ```
 ## Usage
 
@@ -95,50 +95,49 @@ sudo ./controlleridle.sh
 sudo nano /etc/systemd/system/controlleridle.service
 ```
 
-Add the following content to the file:
+- Add the following content to the file:
 
 ```ini
 [Unit]
-Description=Controller Idle Timeout Service
-After=network.target
+Description=Controller Idle Script - Turns off Bluetooth after inactivity
+After=bluetooth.service
 
 [Service]
-ExecStart=/path/to/controlleridle.sh
-Restart=on-failure
-Environment=CONTROLLER_NAME="PLAYSTATION\(R\)3 Controller"
-Environment=IDLE_TIMEOUT=300
-Environment=DEADZONE_THRESHOLD=15
-StandardOutput=journal
-StandardError=journal
-User=root
+Type=simple
+ExecStart=/path/to/your/script/controlleridle.sh
+Restart=always
+User=your-username
+Group=your-group
+Environment=DISPLAY=:0 XAUTHORITY=/home/your-username/.Xauthority
+WorkingDirectory=/home/your-username
 
 [Install]
 WantedBy=multi-user.target
 ```
 
 #### 2. Reload systemd Daemon
-Reload the systemd daemon to recognize the new service:
+- Reload the systemd daemon to recognize the new service:
 
 ```bash
 sudo systemctl daemon-reload
 ```
 
 #### 3. Enable the Service
-Enable the service to start automatically at boot:
+- Enable the service to start automatically at boot:
 
 ```bash
 sudo systemctl enable controlleridle.service
 ```
 
 #### 4. Start the Service
-Start the service immediately:
+- Start the service immediately:
 
 ```bash
 sudo systemctl start controlleridle.service
 ```
 
 #### 5. Check Service Status
-Verify that the service is running:
+- Verify that the service is running:
 
 ```bash
 sudo systemctl status controlleridle.service
