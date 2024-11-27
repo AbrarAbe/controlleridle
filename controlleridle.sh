@@ -34,7 +34,7 @@ monitor_controller() {
     sleep $GRACE_PERIOD
     echo "Grace period over. Starting to monitor inputs."
 
-    sudo evtest --grab "$CONTROLLER_DEVICE" 2>/dev/null | while read -r line; do
+    evtest --grab "$CONTROLLER_DEVICE" 2>/dev/null | while read -r line; do
         CURRENT_TIME=$(date +%s)
         DEADZONE_THRESHOLD=150
 
@@ -76,7 +76,7 @@ monitor_controller() {
         IDLE_TIME=$((CURRENT_TIME - LAST_EVENT_TIME))
         if [ "$IDLE_TIME" -ge "$IDLE_LIMIT" ]; then
             echo "Controller idle for $IDLE_LIMIT seconds. Turning off Bluetooth."
-            bluetoothctl power off && sleep 2 && bluetoothctl power on
+            bluetoothctl power off && sleep 1 && bluetoothctl power on
             break  # Stop monitoring; the controller is off
         fi
     done
