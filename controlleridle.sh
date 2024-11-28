@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
-CONTROLLER_NAME="PLAYSTATION\\(R\\)3 Controller" # Exact name of your controller (with proper escaping for parentheses)
-IDLE_LIMIT=300  # Time in seconds (5 mins)
+CONTROLLER_NAME="PLAYSTATION\\(R\\)3 Controller" # Exact name of your controller
+IDLE_LIMIT=300  # Time in seconds (4 mins)
 GRACE_PERIOD=5  # Grace period after reconnection in seconds
 LAST_EVENT_TIME=$(date +%s)
 
@@ -34,7 +34,8 @@ monitor_controller() {
     sleep $GRACE_PERIOD
     echo "Grace period over. Starting to monitor inputs."
 
-    evtest --grab "$CONTROLLER_DEVICE" 2>/dev/null | while read -r line; do
+    # Run evtest to detect input events
+    evtest "$CONTROLLER_DEVICE" | while read -r line; do
         CURRENT_TIME=$(date +%s)
         DEADZONE_THRESHOLD=150
 
@@ -44,13 +45,13 @@ monitor_controller() {
             local axis_name=$2
 
             # Ensure axis_value is an integer
-            if ! [[ "$axis_value" =~ ^[0-9]+$ ]]; then
+            if ! [[ "$axis_value" =~ ^-?[0-9]+$ ]]; then
                 echo "Invalid axis value: $axis_value"
                 return
             fi
 
             # Check if the movement exceeds the deadzone
-            if [ "$axis_value" -gt "$DEADZONE_THRESHOLD" ] && [ "$axis_value" -lt $((255 - DEADZONE_THRESHOLD)) ]; then
+            if [ "$axis_value" -gt "$DEADZONE_THRESHOLD" ] || [ "$axis_value" -lt $((255 - DEADZONE_THRESHOLD)) ]; then
                 LAST_EVENT_TIME=$(date +%s)  # Reset idle timer
                 echo "Movement detected on $axis_name. Resetting idle timer."
             fi
