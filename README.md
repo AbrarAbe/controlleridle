@@ -54,7 +54,7 @@ Look for the ``Name=`` field corresponding to your controller.
 Set the name of your controller as shown in ``/proc/bus/input/devices``:
 
 ```bash
-CONTROLLER_NAME="PLAYSTATION\\(R\\)3 Controller"
+CONTROLLER_NAME="PLAYSTATION(R)3 Controller"
 ```
 ### Idle Timeout
 
@@ -108,7 +108,6 @@ ExecStart=/path/to/your/script/controlleridle.sh
 Restart=always
 User=your-username
 Group=your-group
-Environment=DISPLAY=:0 XAUTHORITY=/home/your-username/.Xauthority
 WorkingDirectory=/home/your-username
 
 [Install]
